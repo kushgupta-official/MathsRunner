@@ -38,19 +38,26 @@ class Play extends Phaser.Scene{
         this.bg_2.setScrollFactor(0);
 
         // Setting ground
-        this.ground=this.add.tileSprite(0,0,game.config.width,48,"ground");
-        this.ground.setOrigin(0,0);
-        this.ground.setScrollFactor(0);
-        // setting this ground at bottom of the screen
-        this.ground.y=550;
-        //setting physics for ground
-        // this.physics.add.existing(this.ground);
-        
+        //Group with all active platforms
+        this.platformGroup=this.add.group({
+            //removing a platform means adding it to pool
+            removeCallback: function(platform){
+                platform.scene.platformPool.add(platform)
+            }
+        })
+        //platform pool
+        this.platformPool=this.add.group({
+            removeCallback: function(platform){
+                platform.scene.platformGroup.add(platform);
+            }
+        })
+
+        this.addPlatform(game.config.width,game.config.width/2);
         // setting up player
         this.player=this.physics.add.sprite(100,450,"dude");
         this.player.setCollideWorldBounds(true);
         // this.ground.setCollideWorldBounds(true);
-        this.physics.add.collider(this.player,this.ground);
+        this.physics.add.collider(this.player,this.platformGroup);
 
         //creating animation for the player
         this.anims.create({
@@ -59,18 +66,40 @@ class Play extends Phaser.Scene{
             frameRate: 10,
             repeat: -1,
         });
+        // this.groundCollider=this.physics.add.collider(this.player,this.ground,function(){
+        //     if (!this.player.anims.isPlaying){
+        //         this.player.anims.play("move");
+        //     }
+        // },null,this);
         this.player.play("move");
         this.myCam=this.cameras.main;
         this.myCam.setBounds(0,0,game.config.width*3,game.config.height);
         this.myCam.startFollow(this.player);
     }
-    
+    addPlatform(platformWidth,posX){
+        let platform;
+        if(this.platformPool.getLength()){
+            platform = this.platformPool.getFirst();
+            platform.x = posX;
+            platform.active = true;
+            platform.visible = true;
+            this.platformPool.remove(platform);
+        }
+        else{
+            platform = this.physics.add.sprite(posX, game.config.height * 0.8, "platform");
+            platform.setImmovable(true);
+            platform.setVelocityX(gameOptions.platformStartSpeed * -1);
+            this.platformGroup.add(platform);
+        }
+        platform.displayWidth = platformWidth;
+        this.nextPlatformDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
+    }
     update(){
         this.player.x+=3;
         this.player.scaleX=-1;
 
         this.bg_1.tilePositionX = this.myCam.scrollX * .3;
         this.bg_2.tilePositionX = this.myCam.scrollX * .6;
-        this.ground.tilePositionX = this.myCam.scrollX;
+        // this.ground.tilePositionX = this.myCam.scrollX;
     }
 }
