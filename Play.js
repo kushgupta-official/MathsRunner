@@ -32,7 +32,15 @@ let gameOptions={
     platformVerticalLimit: [0.4, 0.8],
 
     //probability of coin occuring on platform
-    coinPercent: 50,
+    coinPercent: 75,
+
+    //probability of question occuring on platform
+    quesPercent: 25,
+
+    //coins value
+    coinValue: 10,
+
+    score: 0,
 }
 class Play extends Phaser.Scene{
     constructor(){
@@ -102,6 +110,10 @@ class Play extends Phaser.Scene{
         });
         // Setting ground
         //Group with all active platforms
+        this.scoreText=this.add.text(16,16,"Score : 0",{
+            fontSize: "32px",
+            fill: "#F7F9F9"
+        });
         this.platformGroup=this.add.group({
             //removing a platform means adding it to pool
             removeCallback: function(platform){
@@ -154,6 +166,7 @@ class Play extends Phaser.Scene{
                 this.player.anims.play("move");
             }
         }, null, this);
+        // overlap between player and coins
         this.physics.add.overlap(this.player,this.coinGroup,function(player,coin){
             this.tweens.add({
                 targets: coin,
@@ -168,6 +181,25 @@ class Play extends Phaser.Scene{
                 }
             });
             coin.disableBody(true, true);
+            gameOptions.score+=gameOptions.coinValue;
+            this.scoreText.setText('Score : ' + gameOptions.score);
+        },null,this);
+
+        //overlap between player and questions
+        this.physics.add.overlap(this.player,this.quesGroup,function(player,ques){
+            this.tweens.add({
+                targets: ques,
+                y: ques.y-100,
+                alpha: 0,
+                duration: 800,
+                ease: "Cubic.easeOut",
+                callbackScope: this,
+                onComplete: function(){
+                    this.quesGroup.killAndHide(ques);
+                    this.quesGroup.remove(ques);
+                }
+            });
+            ques.disableBody(true, true);
         },null,this);
         // this.groundCollider=this.physics.add.collider(this.player,this.ground,function(){
         //     if (!this.player.anims.isPlaying){
@@ -225,6 +257,26 @@ class Play extends Phaser.Scene{
                     this.coinGroup.add(coin);
                 }
             }
+            if(Phaser.Math.Between(1, 100) <= gameOptions.quesPercent){
+                if(this.quesPool.getLength()){
+                    let ques = this.quesPool.getFirst();
+                    ques.x = posX - platformWidth / 2 + Phaser.Math.Between(1, platformWidth);
+                    ques.y = posY - 46;
+                    ques.alpha = 1;
+                    ques.active = true;
+                    ques.visible = true;
+                    this.quesPool.remove(ques);
+                }
+                else{
+                    let ques = this.physics.add.sprite(posX - platformWidth / 2 + Phaser.Math.Between(1, platformWidth), posY - 46, "ques");
+                    // ques.setSize(8,2,true);
+                    ques.scale=0.07;
+                    ques.setImmovable(true);
+                    ques.setVelocityX(platform.body.velocity.x);
+                    // ques.anims.play("rotate");
+                    this.quesGroup.add(ques);
+                }
+            }
         }
     }
     // the player jumps when on the ground, or once in the air as long as there are jumps left and the first jump was on the ground
@@ -249,6 +301,7 @@ class Play extends Phaser.Scene{
         // this.ground.tilePositionX = this.myCam.scrollX;
 
         if(this.player.y > game.config.height){
+            gameOptions.score=0;
             this.scene.start("playGame");
         }
         this.player.x = gameOptions.playerStartPosition;
@@ -276,6 +329,13 @@ class Play extends Phaser.Scene{
             }
         }, this);
 
+        //recycling platforms
+        this.quesGroup.getChildren().forEach(function(ques){
+            if(ques.x < - ques.displayWidth / 2){
+                this.quesGroup.killAndHide(ques);
+                this.quesGroup.remove(ques);
+            }
+        }, this);
         // adding new platforms
         if(minDistance > this.nextPlatformDistance){
             let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
