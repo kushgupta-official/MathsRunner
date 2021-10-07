@@ -2,15 +2,27 @@ let gameScene;
 let answer;
 let marked=-1;
 let options;
+let timeVariable;
+let countdownTimer;
+
+//countdown start time
+let countDuration=15;
+
 
 function submitQuestion(){
+    clearInterval(timeVariable);
     marked = $("input[name='inlineRadioOptions']:checked").val();
+    $('input[name=inlineRadioOptions]').attr('checked',false);
     console.log(marked);
-    if(marked > -1){
+    if (countdownTimer==0){
+        gameScene.scene.resume();
         $('#questionModal').modal('hide');
+    }
+    else if(marked > -1){
         if (options[marked]==answer){
             gameScene.updatePoints(gameOptions.correctAnswerPoints);
         }
+        $('#questionModal').modal('hide');
         gameScene.scene.resume();
     }
 }
@@ -56,7 +68,7 @@ function frameQuestion(){
         options.push(Math.floor(Math.random()*40))*i%2==0?1:-1;
     }
     options=shuffleArray(options);
-    document.getElementById("Option-1").innerHTML=String(options[0]);
+    document.getElementById("Option-1").innerHTML=options[0];
     document.getElementById("Option-2").innerHTML=options[1];
     document.getElementById("Option-3").innerHTML=options[2];
     document.getElementById("Option-4").innerHTML=options[3];
@@ -65,6 +77,22 @@ function frameQuestion(){
 
 function manageQuestion(game){
     gameScene=game;
+    countdownTimer=countDuration;
+    document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
     frameQuestion();
     $('#questionModal').modal('show');
+    timeVariable=setInterval(function(){
+        document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
+        if (countdownTimer==0){
+            clearInterval(timeVariable);
+            submitQuestion();
+        }
+        countdownTimer--;
+    },1000);
+}
+
+function skipQuestion(){
+    clearInterval(timeVariable);
+    $('#questionModal').modal('hide');
+    gameScene.scene.resume();
 }

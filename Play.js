@@ -1,6 +1,4 @@
-// coins
-// maths problem
-// menu bars
+//game over menu
 let gameOptions={
     
     platformStartSpeed: 300,
@@ -32,10 +30,10 @@ let gameOptions={
     platformVerticalLimit: [0.4, 0.8],
 
     //probability of coin occuring on platform
-    coinPercent: 75,
+    coinPercent: 100,//75
 
     //probability of question occuring on platform
-    quesPercent: 25,
+    quesPercent: 100,//25
 
     //coins value
     coinValue: 10,
@@ -216,6 +214,7 @@ class Play extends Phaser.Scene{
         // var spacebarKey=game.input.keyboard.addkey(Pas);
         // spacebarKey.on("down",this.jump);
     }
+
     updatePoints(val){
         gameOptions.score+=val;
         this.scoreText.setText('Score : ' + gameOptions.score);
@@ -314,8 +313,10 @@ class Play extends Phaser.Scene{
         // this.ground.tilePositionX = this.myCam.scrollX;
 
         if(this.player.y > game.config.height){
+            this.scene.pause();
+            gameOver(gameOptions.score,this);
             gameOptions.score=0;
-            this.scene.start("playGame");
+            // this.scene.start("playGame");
         }
         this.player.x = gameOptions.playerStartPosition;
 
