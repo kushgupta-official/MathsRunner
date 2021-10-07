@@ -40,6 +40,8 @@ let gameOptions={
     //coins value
     coinValue: 10,
 
+    correctAnswerPoints: 30,
+
     score: 0,
 }
 class Play extends Phaser.Scene{
@@ -181,8 +183,7 @@ class Play extends Phaser.Scene{
                 }
             });
             coin.disableBody(true, true);
-            gameOptions.score+=gameOptions.coinValue;
-            this.scoreText.setText('Score : ' + gameOptions.score);
+            this.updatePoints(gameOptions.coinValue);
         },null,this);
 
         //overlap between player and questions
@@ -200,6 +201,7 @@ class Play extends Phaser.Scene{
                 }
             });
             ques.disableBody(true, true);
+            this.dispQuestion();
         },null,this);
         // this.groundCollider=this.physics.add.collider(this.player,this.ground,function(){
         //     if (!this.player.anims.isPlaying){
@@ -211,6 +213,17 @@ class Play extends Phaser.Scene{
         // this.myCam.setBounds(0,0,game.config.width*3,game.config.height);
         // this.myCam.startFollow(this.player);
         this.input.on("pointerdown", this.jump, this);
+        // var spacebarKey=game.input.keyboard.addkey(Pas);
+        // spacebarKey.on("down",this.jump);
+    }
+    updatePoints(val){
+        gameOptions.score+=val;
+        this.scoreText.setText('Score : ' + gameOptions.score);
+    }
+    dispQuestion(){
+        this.scene.pause();
+        manageQuestion(this);
+        // this.scene.resume();
     }
     addPlatform(platformWidth, posX, posY){
         this.addedPlatforms++;
