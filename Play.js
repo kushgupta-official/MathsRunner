@@ -1,4 +1,5 @@
 //high score
+
 let clock;
 let timer;
 let gameOptions={
