@@ -11,7 +11,7 @@ window.onload=function(){
                 debug: false
             // }
         },
-        scene:[Play]
+        scene:[play]
     }
     game=new Phaser.Game(config);
     window.focus();
