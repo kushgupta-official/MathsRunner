@@ -109,7 +109,7 @@ class PreloadGame extends Phaser.Scene{
                 start:5,
                 end:8
             }),
-            frameRate: 8,
+            frameRate: 10,
             repeat: -1,
         });
         //creating animation for the stars
@@ -119,7 +119,7 @@ class PreloadGame extends Phaser.Scene{
                 start: 0, 
                 end: 5
             }),
-            frameRate: 10,
+            frameRate: 15,
             yoyo: true,
             repeat: -1
         });
