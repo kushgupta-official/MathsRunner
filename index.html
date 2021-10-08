@@ -17,9 +17,9 @@
         crossorigin="anonymous">
     </script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="phaser.min.js"></script>
     <script src="question.js"></script>
     <script src="gameOver.js"></script>
-    <script src="phaser.min.js"></script>
     <script src="play.js"></script>
     <script src="game.js"></script>
     <script>console.log("hiis");</script>
@@ -28,7 +28,7 @@
 <body>
   <!-- Question Modal -->
   <div class="modal fade" data-backdrop="static" data-keyboard="false" id="questionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+    <div class="modal-dialog">
     
       <!-- Modal content-->
       <div class="modal-content">
@@ -69,35 +69,33 @@
             <button type="button" class="btn btn-secondary" onclick="skipQuestion()">Close</button>
         </div>
       </div>
-      
+    </div>
     </div>
     
 
     <!-- Game Over Modal -->
-    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="gameOverModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" data-backdrop="static" data-keyboard="false" id="gameOverModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" style="margin-top: 100px">
           <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Game Over</h5>
-              <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
-                <!-- <span aria-hidden="true">&times;</span>
-              </button> -->
-            </div>
-            <div class="modal-body">
-                Your Survival Time : 00:00
-                Total Score : 
-                <label id="Total-Score">
-                0
-                </label>
-            </div>
-            <div class="modal-footer">
-              <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
-              <button type="button" class="btn btn-primary" onclick="playAgain()">Play Again</button>
-            </div>
+              <div class="modal-header" >
+                  <h1 class="modal-title" id="myModalLabel" style="text-align: center">GAME OVER</h1>
+                  
+              </div>
+              <div class="modal-body" style="text-align: center">
+                  <div style="margin-bottom: 30px">
+                      <h4>Your Survival Time: </h4>
+                      <h2 id="survivalTime" style="margin-top: 10px" >00:00</h2>
+                  </div>
+                  <div >
+                      <h4>Points Earned: </h4>
+                      <h2 id="Total-Score" style="margin-top: 10px">0</h2>
+                  </div>
+              </div>
+              <div class="modal-footer" style="text-align: center">
+                  <button class="btn btn-primary btn-lg" onclick="playAgain()">PLAY AGAIN</button>
+              </div>
           </div>
-        </div>
       </div>
-
   </div>
 </body>
 </html>

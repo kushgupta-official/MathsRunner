@@ -10,20 +10,23 @@ let countDuration=15;
 
 
 function submitQuestion(){
-    clearInterval(timeVariable);
     marked = $("input[name='inlineRadioOptions']:checked").val();
     $('input[name=inlineRadioOptions]').attr('checked',false);
-    console.log(marked);
+    console.log(countDuration);
     if (countdownTimer==0){
-        gameScene.scene.resume();
         $('#questionModal').modal('hide');
+        gameScene.scene.resume();
     }
     else if(marked > -1){
+        clearInterval(timeVariable);
         if (options[marked]==answer){
             gameScene.updatePoints(gameOptions.correctAnswerPoints);
         }
         $('#questionModal').modal('hide');
         gameScene.scene.resume();
+    }
+    else{
+        return;
     }
 }
 
@@ -93,6 +96,7 @@ function manageQuestion(game){
 
 function skipQuestion(){
     clearInterval(timeVariable);
+    $('input[name=inlineRadioOptions]').attr('checked',false);
     $('#questionModal').modal('hide');
     gameScene.scene.resume();
 }

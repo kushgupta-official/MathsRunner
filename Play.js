@@ -314,7 +314,7 @@ class Play extends Phaser.Scene{
 
         if(this.player.y > game.config.height){
             this.scene.pause();
-            gameOver(gameOptions.score,this);
+            manageGameOver(gameOptions.score,this);
             gameOptions.score=0;
             // this.scene.start("playGame");
         }
