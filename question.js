@@ -1,3 +1,4 @@
+//Ponint not updating after correct answer
 let gameScene;
 let answer;
 let marked=-1;
@@ -12,18 +13,24 @@ let countDuration=15;
 function submitQuestion(){
     marked = $("input[name='inlineRadioOptions']:checked").val();
     $('input[name=inlineRadioOptions]').attr('checked',false);
-    console.log(countDuration);
     if (countdownTimer==0){
+        marked=-1;
         $('#questionModal').modal('hide');
-        gameScene.scene.resume();
+        showAlert(0);
+        // gameScene.scene.resume();
     }
     else if(marked > -1){
         clearInterval(timeVariable);
         if (options[marked]==answer){
             gameScene.updatePoints(gameOptions.correctAnswerPoints);
+            showAlert(1);
+        }
+        else{
+            showAlert(0);
         }
         $('#questionModal').modal('hide');
-        gameScene.scene.resume();
+        // showAlert(1);
+        // gameScene.scene.resume();
     }
     else{
         return;
@@ -84,6 +91,7 @@ function manageQuestion(game){
     document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
     frameQuestion();
     $('#questionModal').modal('show');
+    countdownTimer--;
     timeVariable=setInterval(function(){
         document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
         if (countdownTimer==0){
@@ -98,5 +106,33 @@ function skipQuestion(){
     clearInterval(timeVariable);
     $('input[name=inlineRadioOptions]').attr('checked',false);
     $('#questionModal').modal('hide');
-    gameScene.scene.resume();
+    showAlert(0);
+}
+
+function showAlert(correct) {
+    console.log(marked);
+    let className;
+    let message;
+
+    if(correct) {
+        className = "alert alert-success collapse";
+        message = "Correct Answer, you earned "+gameOptions.correctAnswerPoints+" points.";
+    } else if(marked<0) {
+        className = "alert alert-warning collapse";
+        message = "Missed it, the correct answer is "+answer;
+    } else{
+        className = "alert alert-danger collapse";
+        message = "Wrong Answer, the correct answer is "+answer;
+    }
+
+    $("#alert").attr("class",className);
+    $("#alert").text(message);
+    $('#alert').show('fade');
+
+    setTimeout(function(){
+        $('#alert').hide('fade');
+    },2000);
+    setTimeout(function(){
+        gameScene.scene.resume();
+    },2000);
 }

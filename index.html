@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maths Runner - Practise maths while playing</title>
     <link 
@@ -17,6 +17,22 @@
         crossorigin="anonymous">
     </script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <style type = "text/css">
+      /* body{
+          background: #000000;
+          padding: 0px;
+          margin: 0px;
+      } */
+      canvas{
+          display:block;
+          margin: 0;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+      }
+      
+  </style>
     <script src="phaser.min.js"></script>
     <script src="question.js"></script>
     <script src="gameOver.js"></script>
@@ -66,7 +82,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-primary" onclick="submitQuestion()">Submit</button>
-            <button type="button" class="btn btn-secondary" onclick="skipQuestion()">Close</button>
+            <button type="button" class="btn btn-secondary" onclick="skipQuestion()">Skip</button>
         </div>
       </div>
     </div>
@@ -96,6 +112,12 @@
               </div>
           </div>
       </div>
+  </div>
+
+  <!-- Alert Div shown after Question Modal -->
+  <div id="alert" class="alert alert-success collapse" style="z-index: 100; position: absolute; top: 20%; left: 50%; transform: translate(-50%, 0px);">
+    <a href="#" class="close" aria-label="close">&times;</a>
+    <strong>Success!</strong> Indicates a successful or positive action.
   </div>
 </body>
 </html>

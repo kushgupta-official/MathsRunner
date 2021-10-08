@@ -1,4 +1,5 @@
-//game over menu
+let clock;
+let timer;
 let gameOptions={
     
     platformStartSpeed: 300,
@@ -47,6 +48,10 @@ class Play extends Phaser.Scene{
         super("playGame");
     }
     preload(){
+        this.load.plugin('rexclockplugin',
+                         'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexclockplugin.min.js', 
+                         true
+                        );
         this.load.image('sky','assets/sky.png');
         this.load.image('ground','assets/ground.png');
         this.load.image('bg_1','assets/bg_1.png');
@@ -114,6 +119,23 @@ class Play extends Phaser.Scene{
             fontSize: "32px",
             fill: "#F7F9F9"
         });
+
+        //Setting Timer in Game
+        this.timerText = this.add.text(1100, 16, 'Time: 00:00', { fontSize: '32px', fill: '#F7F9F9' });
+        clock = this.plugins.get('rexclockplugin').add(this, game);
+        clock.start();
+        timer = this.time.addEvent({
+            delay: 1000,                // ms
+            callback: () => {
+                this.timmerValue = this.millisToMinutesAndSeconds(clock.now);
+                this.timerText.setText('Time: ' + this.timmerValue);
+                console.log();
+            },
+            loop: true
+        });
+        this.coinsValue = gameOptions.score;
+        this.timmerValue = this.millisToMinutesAndSeconds(clock.now);
+
         this.platformGroup=this.add.group({
             //removing a platform means adding it to pool
             removeCallback: function(platform){
@@ -314,7 +336,7 @@ class Play extends Phaser.Scene{
 
         if(this.player.y > game.config.height){
             this.scene.pause();
-            manageGameOver(gameOptions.score,this);
+            manageGameOver(gameOptions.score,this.timmerValue,this);
             gameOptions.score=0;
             // this.scene.start("playGame");
         }
@@ -360,5 +382,10 @@ class Play extends Phaser.Scene{
             let nextPlatformHeight = Phaser.Math.Clamp(nextPlatformGap, minPlatformHeight, maxPlatformHeight);
             this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2, nextPlatformHeight);
         }
+    }
+    millisToMinutesAndSeconds(millis) {
+        let minutes = Math.floor(millis / 60000);
+        let seconds = ((millis % 60000) / 1000).toFixed(0);
+        return (seconds == 60 ? (minutes+1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
     }
 }
