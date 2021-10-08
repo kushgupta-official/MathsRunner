@@ -61,7 +61,7 @@ window.onload=function(){
                 debug: false
             // }
         },
-        scene:[Play]
+        scene:[PreloadGame, Play]
     }
     game=new Phaser.Game(config);
     window.focus();
@@ -69,9 +69,9 @@ window.onload=function(){
     window.addEventListener("resize",resize,false);
 }
 
-class Play extends Phaser.Scene{
+class PreloadGame extends Phaser.Scene{
     constructor(){
-        super("playGame");
+        super("PreloadGame");
     }
     preload(){
         this.load.plugin('rexclockplugin',
@@ -100,11 +100,9 @@ class Play extends Phaser.Scene{
             frameHeight: 512
         });
     }
-    
-    create(){
 
+    create(){
         //creating animation for the player
-        this.addedPlatforms=0;
         this.anims.create({
             key: "move",
             frames: this.anims.generateFrameNumbers("dude",{
@@ -125,7 +123,17 @@ class Play extends Phaser.Scene{
             yoyo: true,
             repeat: -1
         });
+        this.scene.start("playGame");
+    }
+}
 
+class Play extends Phaser.Scene{
+    constructor(){
+        super("playGame");
+    }
+
+    create(){
+        this.addedPlatforms=0;
         //mountains (at background) group
         this.mountainGroup=this.add.group();
         this.addMountains();
