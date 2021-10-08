@@ -5,7 +5,7 @@ let marked=-1;
 let options;
 let timeVariable;
 let countdownTimer;
-
+let timmer;
 //countdown start time
 let countDuration=15;
 
@@ -15,6 +15,7 @@ function submitQuestion(){
     $('input[name=inlineRadioOptions]').attr('checked',false);
     if (countdownTimer==0){
         marked=-1;
+        gameScene.updatePoints(gameOptions.wrongAnswerPoints);
         $('#questionModal').modal('hide');
         showAlert(0);
         // gameScene.scene.resume();
@@ -26,6 +27,7 @@ function submitQuestion(){
             showAlert(1);
         }
         else{
+            gameScene.updatePoints(gameOptions.wrongAnswerPoints);
             showAlert(0);
         }
         $('#questionModal').modal('hide');
@@ -85,8 +87,9 @@ function frameQuestion(){
     // console.log(options);
 }
 
-function manageQuestion(game){
+function manageQuestion(game,time){
     gameScene=game;
+    timmer=time;
     countdownTimer=countDuration;
     document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
     frameQuestion();
@@ -106,6 +109,8 @@ function skipQuestion(){
     clearInterval(timeVariable);
     $('input[name=inlineRadioOptions]').attr('checked',false);
     $('#questionModal').modal('hide');
+    marked=-1;
+    gameScene.updatePoints(gameOptions.wrongAnswerPoints);
     showAlert(0);
 }
 
@@ -119,10 +124,10 @@ function showAlert(correct) {
         message = "Correct Answer, you earned "+gameOptions.correctAnswerPoints+" points.";
     } else if(marked<0) {
         className = "alert alert-warning collapse";
-        message = "Missed it, the correct answer is "+answer;
+        message = "Missed it, you lost 10 Points, the correct answer is "+answer;
     } else{
         className = "alert alert-danger collapse";
-        message = "Wrong Answer, the correct answer is "+answer;
+        message = "Wrong Answer, you lost 10 Points, the correct answer is "+answer;
     }
 
     $("#alert").attr("class",className);
@@ -132,7 +137,15 @@ function showAlert(correct) {
     setTimeout(function(){
         $('#alert').hide('fade');
     },2000);
+    // if (gameOptions.score<0){
+    //     console.log("reached");
+    //     setTimeout(() => {
+    //         manageGameOver(gameOptions.score,timmer,gameScene);
+    //     }, 2000);
+    // }
+    // else{
     setTimeout(function(){
         gameScene.scene.resume();
     },2000);
+    // }
 }

@@ -1,6 +1,9 @@
+//high score
 let clock;
 let timer;
 let gameOptions={
+
+    mountainSpeed: 80,  
     
     platformStartSpeed: 300,
 
@@ -31,16 +34,18 @@ let gameOptions={
     platformVerticalLimit: [0.4, 0.8],
 
     //probability of coin occuring on platform
-    coinPercent: 100,//75
+    coinPercent: 75,//75
 
     //probability of question occuring on platform
-    quesPercent: 100,//25
+    quesPercent: 25,//25
 
     //coins value
     coinValue: 10,
 
     correctAnswerPoints: 30,
 
+    wrongAnswerPoints: -10,
+    
     score: 0,
 }
 class Play extends Phaser.Scene{
@@ -58,38 +63,24 @@ class Play extends Phaser.Scene{
         this.load.image('bg_2','assets/bg_2.png');
         this.load.image('platform','assets/platform.png');
         this.load.image('ques','assets/ques.png');
+
         this.load.spritesheet("coin", "assets/coin.png", {
             frameWidth: 20,
             frameHeight: 20
-        }); 
+        });
+        // moving player 
         this.load.spritesheet('dude','assets/dude.png', {
              frameWidth: 32, 
              frameHeight: 48 
         });
+        // mountains at the background
+        this.load.spritesheet("mountain", "assets/mountain.png", {
+            frameWidth: 512,
+            frameHeight: 512
+        });
     }
     
     create(){
-        // this.add.image(800,300,'sky');
-        // this.add.tileSprite(800,300,1600,600,'sky');
-        // this.add.tileSprite(800,580,1600,32,'ground');
-        // let player=this.physics.add.sprite(100,450,'dude');
-        // player.setCollideWorldBounds(true);
-        // player.setBounce(0.2);
-        // this.physics.add.collider(player,ground);
-
-        // Setting the Background
-        // this.bg_1=this.add.tileSprite(0,0,game.config.width,game.config.height,"sky");
-        // // Set its pivot to the top left corner
-        // this.bg_1.setOrigin(0,0);
-        // // fixing it so it won't move when the camera moves.
-        // // Instead moving its texture on the update
-        // this.bg_1.setScrollFactor(0);
-
-
-        // // Setting second Background same as first
-        // this.bg_2=this.add.tileSprite(0,0,game.config.width,game.config.height,"bg_2");
-        // this.bg_2.setOrigin(0,0);
-        // this.bg_2.setScrollFactor(0);
 
         //creating animation for the player
         this.addedPlatforms=0;
@@ -109,12 +100,16 @@ class Play extends Phaser.Scene{
                 start: 0, 
                 end: 5
             }),
-            frameRate: 15,
+            frameRate: 10,
             yoyo: true,
             repeat: -1
         });
-        // Setting ground
-        //Group with all active platforms
+
+        //mountains (at background) group
+        this.mountainGroup=this.add.group();
+        this.addMountains();
+
+        //score text at top left corner
         this.scoreText=this.add.text(16,16,"Score : 0",{
             fontSize: "32px",
             fill: "#F7F9F9"
@@ -136,13 +131,15 @@ class Play extends Phaser.Scene{
         this.coinsValue = gameOptions.score;
         this.timmerValue = this.millisToMinutesAndSeconds(clock.now);
 
+        // Setting ground
+        //Group with all active platforms
         this.platformGroup=this.add.group({
-            //removing a platform means adding it to pool
+            //removing a platform means adding it to platform pool
             removeCallback: function(platform){
-                platform.scene.platformPool.add(platform)
+                platform.scene.platformPool.add(platform);
             }
         });
-        //platform pool
+        //platform pool-where platforms are not active
         this.platformPool=this.add.group({
             removeCallback: function(platform){
                 platform.scene.platformGroup.add(platform);
@@ -180,6 +177,7 @@ class Play extends Phaser.Scene{
         this.player.anims.play("move");
         // this.player.setCollideWorldBounds(true);
         this.player.setGravityY(gameOptions.playerGravity);
+        this.player.setDepth(2);
 
         this.physics.add.collider(this.player, this.platformGroup, function(){
  
@@ -188,6 +186,7 @@ class Play extends Phaser.Scene{
                 this.player.anims.play("move");
             }
         }, null, this);
+
         // overlap between player and coins
         this.physics.add.overlap(this.player,this.coinGroup,function(player,coin){
             this.tweens.add({
@@ -237,13 +236,46 @@ class Play extends Phaser.Scene{
         // spacebarKey.on("down",this.jump);
     }
 
+    //adding mountains
+    addMountains(){
+        let rightmostMountain = this.getRightmostMountain();
+        if(rightmostMountain < game.config.width * 2){
+            let mountain = this.physics.add.sprite(rightmostMountain + Phaser.Math.Between(100, 350), game.config.height + Phaser.Math.Between(0, 100), "mountain");
+            mountain.setOrigin(0.5, 1);
+            mountain.body.setVelocityX(gameOptions.mountainSpeed * -1)
+            this.mountainGroup.add(mountain);
+            if(Phaser.Math.Between(0, 1)){
+                mountain.setDepth(1);
+            }
+            mountain.setFrame(Phaser.Math.Between(0, 3))
+            this.addMountains()
+        }
+    }
+
+    // getting rightmost mountain x position
+    getRightmostMountain(){
+        let rightmostMountain = -200;
+        this.mountainGroup.getChildren().forEach(function(mountain){
+            rightmostMountain = Math.max(rightmostMountain, mountain.x);
+        })
+        return rightmostMountain;
+    }
     updatePoints(val){
         gameOptions.score+=val;
         this.scoreText.setText('Score : ' + gameOptions.score);
+        console.log("changed");
+        // if (gameOptions.score<0){
+        //     // setTimeout(function(){
+        //     //     this.scene.pause();
+        //     // },2000);
+        //     this.scene.pause();
+        //     manageGameOver(gameOptions.score,this.timmerValue,this);
+        //     gameOptions.score=0;
+        // }
     }
     dispQuestion(){
         this.scene.pause();
-        manageQuestion(this);
+        manageQuestion(this,this.timmerValue);
         // this.scene.resume();
     }
     addPlatform(platformWidth, posX, posY){
@@ -266,6 +298,7 @@ class Play extends Phaser.Scene{
             this.physics.add.existing(platform);
             platform.body.setImmovable(true);
             platform.body.setVelocityX(gameOptions.platformStartSpeed * -1);
+            platform.setDepth(2);
             this.platformGroup.add(platform);
         }
         // platform.displayWidth = platformWidth;
@@ -288,6 +321,7 @@ class Play extends Phaser.Scene{
                     coin.setImmovable(true);
                     coin.setVelocityX(platform.body.velocity.x);
                     coin.anims.play("rotate");
+                    coin.setDepth(2);
                     this.coinGroup.add(coin);
                 }
             }
@@ -307,7 +341,7 @@ class Play extends Phaser.Scene{
                     ques.scale=0.07;
                     ques.setImmovable(true);
                     ques.setVelocityX(platform.body.velocity.x);
-                    // ques.anims.play("rotate");
+                    ques.setDepth(2);
                     this.quesGroup.add(ques);
                 }
             }
@@ -341,6 +375,19 @@ class Play extends Phaser.Scene{
             // this.scene.start("playGame");
         }
         this.player.x = gameOptions.playerStartPosition;
+        
+        // recycling mountains
+        this.mountainGroup.getChildren().forEach(function(mountain){
+            if(mountain.x < - mountain.displayWidth){
+                let rightmostMountain = this.getRightmostMountain();
+                mountain.x = rightmostMountain + Phaser.Math.Between(100, 350);
+                mountain.y = game.config.height + Phaser.Math.Between(0, 100);
+                mountain.setFrame(Phaser.Math.Between(0, 3))
+                if(Phaser.Math.Between(0, 1)){
+                    mountain.setDepth(1);
+                }
+            }
+        }, this);
 
         // recycling platforms
         let minDistance = game.config.width;
@@ -372,6 +419,7 @@ class Play extends Phaser.Scene{
                 this.quesGroup.remove(ques);
             }
         }, this);
+
         // adding new platforms
         if(minDistance > this.nextPlatformDistance){
             let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
@@ -383,6 +431,8 @@ class Play extends Phaser.Scene{
             this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2, nextPlatformHeight);
         }
     }
+
+    //for timmer
     millisToMinutesAndSeconds(millis) {
         let minutes = Math.floor(millis / 60000);
         let seconds = ((millis % 60000) / 1000).toFixed(0);
