@@ -76,9 +76,13 @@ function frameQuestion(){
     // console.log(question);   
     answer=eval(question);
     options=[answer];
-    for (let i=0;i<3;i++){
-        options.push(Math.floor(Math.random()*40))*i%2==0?1:-1;
-    }
+    // for (let i=0;i<3;i++){
+    //     options.push(Math.floor(Math.random()*40))*i%2==0?1:-1;
+    // }
+    // options.push(Math.floor(Math.random()*40));
+    options.push(answer+1);
+    options.push(answer-1);
+    options.push(answer+2);
     options=shuffleArray(options);
     document.getElementById("Option-1").innerHTML=options[0];
     document.getElementById("Option-2").innerHTML=options[1];
