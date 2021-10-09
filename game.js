@@ -74,17 +74,19 @@ class PreloadGame extends Phaser.Scene{
         super("PreloadGame");
     }
     preload(){
+        //plugin for elapsed time
         this.load.plugin('rexclockplugin',
                          'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexclockplugin.min.js', 
                          true
                         );
-        this.load.image('sky','assets/sky.png');
-        this.load.image('ground','assets/ground.png');
-        this.load.image('bg_1','assets/bg_1.png');
-        this.load.image('bg_2','assets/bg_2.png');
+
+        // this.load.image('sky','assets/sky.png');
         this.load.image('platform','assets/platform.png');
+
+        //Question
         this.load.image('ques','assets/ques.png');
 
+        //Roatating Coin
         this.load.spritesheet("coin", "assets/coin.png", {
             frameWidth: 20,
             frameHeight: 20
@@ -134,6 +136,7 @@ class Play extends Phaser.Scene{
 
     create(){
         this.addedPlatforms=0;
+
         //mountains (at background) group
         this.mountainGroup=this.add.group();
         this.addMountains();
@@ -157,6 +160,7 @@ class Play extends Phaser.Scene{
             },
             loop: true
         });
+
         this.coinsValue = gameOptions.score;
         this.timmerValue = this.millisToMinutesAndSeconds(clock.now);
 
@@ -200,14 +204,17 @@ class Play extends Phaser.Scene{
         });
 
         this.playerJumps=0;
+
+        //adding platforms
         this.addPlatform(game.config.width,game.config.width/2,game.config.height*gameOptions.platformVerticalLimit[1]);
+
         // setting up player
         this.player=this.physics.add.sprite(gameOptions.playerStartPosition,game.config.height*0.7,"dude");
         this.player.anims.play("move");
-        // this.player.setCollideWorldBounds(true);
         this.player.setGravityY(gameOptions.playerGravity);
         this.player.setDepth(2);
 
+        //Function when player is touching a platform
         this.physics.add.collider(this.player, this.platformGroup, function(){
  
             // play "run" animation if the player is on a platform
@@ -251,18 +258,9 @@ class Play extends Phaser.Scene{
             ques.disableBody(true, true);
             this.dispQuestion();
         },null,this);
-        // this.groundCollider=this.physics.add.collider(this.player,this.ground,function(){
-        //     if (!this.player.anims.isPlaying){
-        //         this.player.anims.play("move");
-        //     }
-        // },null,this);
-        // this.player.play("move");
-        // this.myCam=this.cameras.main;
-        // this.myCam.setBounds(0,0,game.config.width*3,game.config.height);
-        // this.myCam.startFollow(this.player);
+
+        //input on mouse click
         this.input.on("pointerdown", this.jump, this);
-        // var spacebarKey=game.input.keyboard.addkey(Pas);
-        // spacebarKey.on("down",this.jump);
     }
 
     //adding mountains
@@ -289,24 +287,22 @@ class Play extends Phaser.Scene{
         })
         return rightmostMountain;
     }
+
+    //updating points
     updatePoints(val){
         gameOptions.score+=val;
         this.scoreText.setText('Score : ' + gameOptions.score);
         console.log("changed");
-        // if (gameOptions.score<0){
-        //     // setTimeout(function(){
-        //     //     this.scene.pause();
-        //     // },2000);
-        //     this.scene.pause();
-        //     manageGameOver(gameOptions.score,this.timmerValue,this);
-        //     gameOptions.score=0;
-        // }
     }
+
+    //display question
     dispQuestion(){
         this.scene.pause();
         manageQuestion(this,this.timmerValue);
         // this.scene.resume();
     }
+
+    //adding platform
     addPlatform(platformWidth, posX, posY){
         this.addedPlatforms++;
         let platform;
@@ -322,7 +318,6 @@ class Play extends Phaser.Scene{
             platform.tileScaleX = 1 / platform.scaleX;
         }
         else{
-            // platform = this.physics.add.sprite(posX, game.config.height * 0.8, "platform");
             platform = this.add.tileSprite(posX, posY, platformWidth, 32, "platform");
             this.physics.add.existing(platform);
             platform.body.setImmovable(true);
@@ -330,10 +325,9 @@ class Play extends Phaser.Scene{
             platform.setDepth(2);
             this.platformGroup.add(platform);
         }
-        // platform.displayWidth = platformWidth;
         this.nextPlatformDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
 
-        // is there a coin over the platform?
+        // is there a coin or question over the platform?
         if(this.addedPlatforms > 1){
             if(Phaser.Math.Between(1, 100) <= gameOptions.coinPercent){
                 if(this.coinPool.getLength()){
@@ -376,6 +370,7 @@ class Play extends Phaser.Scene{
             }
         }
     }
+
     // the player jumps when on the ground, or once in the air as long as there are jumps left and the first jump was on the ground
     jump(){
         if(this.player.body.touching.down || (this.playerJumps > 0 && this.playerJumps < gameOptions.jumps)){
@@ -390,18 +385,11 @@ class Play extends Phaser.Scene{
         }
     }
     update(){
-        // this.player.x+=3;
-        // this.player.scaleX=-1;
-
-        // this.bg_1.tilePositionX = this.myCam.scrollX * .3;
-        // this.bg_2.tilePositionX = this.myCam.scrollX * .6;
-        // this.ground.tilePositionX = this.myCam.scrollX;
-
+        //When player falls, game is over
         if(this.player.y > game.config.height){
             this.scene.pause();
             manageGameOver(gameOptions.score,this.timmerValue,this);
             gameOptions.score=0;
-            // this.scene.start("playGame");
         }
         this.player.x = gameOptions.playerStartPosition;
         
@@ -469,6 +457,7 @@ class Play extends Phaser.Scene{
     }
 }
 
+// canvas resize according to the screen ratio/size
 function resize(){
     let canvas = document.querySelector("canvas");
     let windowWidth = window.innerWidth;

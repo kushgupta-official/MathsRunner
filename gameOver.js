@@ -1,3 +1,4 @@
+// Game Over Modal shown up after player fells
 function manageGameOver(score,timmerValue,game){
     gameScene=game;
     document.getElementById("Total-Score").innerHTML=score;

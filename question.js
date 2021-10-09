@@ -1,4 +1,3 @@
-//Ponint not updating after correct answer
 let gameScene;
 let answer;
 let marked=-1;
@@ -6,33 +5,35 @@ let options;
 let timeVariable;
 let countdownTimer;
 let timmer;
-//countdown start time
 let countDuration=15;
 
 
 function submitQuestion(){
     marked = $("input[name='inlineRadioOptions']:checked").val();
     $('input[name=inlineRadioOptions]').attr('checked',false);
+
+    //If time is finished
     if (countdownTimer==0){
         marked=-1;
         gameScene.updatePoints(gameOptions.wrongAnswerPoints);
         $('#questionModal').modal('hide');
         showAlert(0);
-        // gameScene.scene.resume();
     }
+
+    //Answer marked and submitted before end of time
     else if(marked > -1){
         clearInterval(timeVariable);
+        //if answer marked is correct
         if (options[marked]==answer){
             gameScene.updatePoints(gameOptions.correctAnswerPoints);
             showAlert(1);
         }
+        //if answer marked is wrong
         else{
             gameScene.updatePoints(gameOptions.wrongAnswerPoints);
             showAlert(0);
         }
         $('#questionModal').modal('hide');
-        // showAlert(1);
-        // gameScene.scene.resume();
     }
     else{
         return;
@@ -56,6 +57,7 @@ function shuffleArray(array) {
 function frameQuestion(){
     let question="";
     let operator,operand;
+    //randomly generating question
     for (let i=0;i<4;i++){
         if (Math.floor(Math.random()*2)){
             operator="+";
@@ -73,32 +75,42 @@ function frameQuestion(){
         question+=operator+operand;
     }
     document.getElementById("Question-Text").innerHTML="Solve : "+question;
-    // console.log(question);   
     answer=eval(question);
     options=[answer];
+    //For randomly generating options
     // for (let i=0;i<3;i++){
     //     options.push(Math.floor(Math.random()*40))*i%2==0?1:-1;
     // }
-    // options.push(Math.floor(Math.random()*40));
+
+    //Near to answer values options
     options.push(answer+1);
     options.push(answer-1);
     options.push(answer+2);
+
+    //shuffling options
     options=shuffleArray(options);
+
+    //assigning options
     document.getElementById("Option-1").innerHTML=options[0];
     document.getElementById("Option-2").innerHTML=options[1];
     document.getElementById("Option-3").innerHTML=options[2];
     document.getElementById("Option-4").innerHTML=options[3];
-    // console.log(options);
 }
 
 function manageQuestion(game,time){
     gameScene=game;
     timmer=time;
+
+    //Time Left for solving question
     countdownTimer=countDuration;
     document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
+
+    //Framing Question
     frameQuestion();
     $('#questionModal').modal('show');
     countdownTimer--;
+
+    //Countdown Timer
     timeVariable=setInterval(function(){
         document.getElementById("countdown").innerHTML="Time left : " + countdownTimer;
         if (countdownTimer==0){
@@ -118,6 +130,7 @@ function skipQuestion(){
     showAlert(0);
 }
 
+//Alert popup after Question Modal
 function showAlert(correct) {
     console.log(marked);
     let className;
@@ -141,15 +154,7 @@ function showAlert(correct) {
     setTimeout(function(){
         $('#alert').hide('fade');
     },2000);
-    // if (gameOptions.score<0){
-    //     console.log("reached");
-    //     setTimeout(() => {
-    //         manageGameOver(gameOptions.score,timmer,gameScene);
-    //     }, 2000);
-    // }
-    // else{
     setTimeout(function(){
         gameScene.scene.resume();
     },2000);
-    // }
 }
