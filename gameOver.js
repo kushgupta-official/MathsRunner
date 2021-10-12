@@ -5,11 +5,9 @@ function manageGameOver(score,timmerValue,game){
     document.getElementById("survivalTime").innerHTML=timmerValue;
     gameOptions.score=0;
     $('#gameOverModal').modal('show');
-    console.log("hiii");
 }
 
 function playAgain(){
     $('#gameOverModal').modal('hide');
     gameScene.scene.start("playGame");
-    console.log("haii")
 }

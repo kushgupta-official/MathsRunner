@@ -156,7 +156,6 @@ class Play extends Phaser.Scene{
             callback: () => {
                 this.timmerValue = this.millisToMinutesAndSeconds(clock.now);
                 this.timerText.setText('Time: ' + this.timmerValue);
-                console.log();
             },
             loop: true
         });
@@ -292,7 +291,6 @@ class Play extends Phaser.Scene{
     updatePoints(val){
         gameOptions.score+=val;
         this.scoreText.setText('Score : ' + gameOptions.score);
-        console.log("changed");
     }
 
     //display question

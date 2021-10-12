@@ -132,7 +132,6 @@ function skipQuestion(){
 
 //Alert popup after Question Modal
 function showAlert(correct) {
-    console.log(marked);
     let className;
     let message;
 
