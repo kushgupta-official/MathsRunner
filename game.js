@@ -383,7 +383,7 @@ class Play extends Phaser.Scene{
         }
     }
     update(){
-        //When player falls, game is over
+        //When player falls, game is over and a pop up comes
         if(this.player.y > game.config.height){
             this.scene.pause();
             manageGameOver(gameOptions.score,this.timmerValue,this);
